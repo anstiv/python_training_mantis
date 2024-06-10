@@ -1,5 +1,4 @@
 from model.project import Project
-import time
 
 
 class ProjectHelper:
@@ -8,8 +7,9 @@ class ProjectHelper:
 
     def open_projects_page(self):
         wd = self.app.wd
-        wd.find_element_by_xpath("//a[contains(text(),'Manage')]").click()
-        wd.find_element_by_xpath("//a[contains(text(),'Manage Projects')]").click()
+        if not (wd.current_url.endswith("/manage_proj_page.php")):
+            wd.find_element_by_xpath("//a[contains(text(),'Manage')]").click()
+            wd.find_element_by_xpath("//a[contains(text(),'Manage Projects')]").click()
 
     def open_create_project_page(self):
         wd = self.app.wd
@@ -40,7 +40,6 @@ class ProjectHelper:
         self.fill_form(project)
         self.click_add_project()
         self.project_cache = None
-        #time.sleep(5)
 
     project_cache = None
 
@@ -49,7 +48,6 @@ class ProjectHelper:
             wd = self.app.wd
             self.open_projects_page()
             self.project_cache = []
-            #for element in wd.find_elements_by_xpath("//div[@id='main-container']/div[2]/div[2]/div/div/div[2]/div[2]/div/div[2]/table/tbody/tr"):
             for element in wd.find_elements_by_xpath("//table[3]/tbody/tr")[2:]:
                 name = element.find_element_by_css_selector("td:nth-child(1)").text
                 s = str(len(self.project_cache)+3)
@@ -60,3 +58,20 @@ class ProjectHelper:
                 self.project_cache.append(Project(name=name, description=description, id=id))
 
         return list(self.project_cache)
+
+    def delete_project_by_index(self, index):
+        wd = self.app.wd
+        self.open_projects_page()
+        self.select_project_by_index(index)
+        wd.find_element_by_xpath("//div[4]/form/input[3]").click()
+        wd.find_element_by_xpath("//div[2]/form/input[4]").click()
+        self.project_cache = None
+
+    def select_project_by_index(self, index):
+        wd = self.app.wd
+        wd.find_element_by_xpath("//table[3]/tbody/tr[%s]/td[1]/a" % str(index+3)).click()
+
+    def count(self):
+        wd = self.app.wd
+        self.open_projects_page()
+        return len(wd.find_elements_by_xpath("//table[3]/tbody/tr")[2:])
