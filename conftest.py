@@ -27,7 +27,7 @@ def app(request, config):
     global fixture
     browser = request.config.getoption("--browser")
     if fixture is None or not fixture.is_valid():
-        fixture = Application(browser=browser, base_url=config["web"]["baseUrl"])
+        fixture = Application(browser=browser, config=config)
     return fixture
 
 
@@ -57,11 +57,8 @@ def configure_server(request, config):
 
 def install_server_configuration(host, username, password):
     with ftputil.FTPHost(host, username, password) as remote:
-        p1 = remote.path.isfile("config_inc.php.bak")
         if remote.path.isfile("config_inc.php.bak"):
             remote.remove("config_inc.php.bak")
-        p2 = remote.path.isfile("config_inc.php")
-        p3 = os.path.join(os.path.dirname(__file__), "resources/config_inc.php")
         if remote.path.isfile("config_inc.php"):
             remote.rename("config_inc.php", "config_inc.php.bak")
         remote.upload(os.path.join(os.path.dirname(__file__), "resources/config_inc.php"), "config_inc.php")
