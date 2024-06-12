@@ -53,7 +53,7 @@ class ProjectHelper:
                 s = str(len(self.project_cache)+3)
                 id_not_fetched = (element.find_element_by_xpath("//table[3]/tbody/tr[%s]/td[1]/a" % s).get_attribute("href"))
                 id = id_not_fetched.replace(
-                    "http://localhost/mantisbt-1.2.20/manage_proj_edit_page.php?project_id=", "")
+                    self.app.config["web"]["baseUrl"] + "/manage_proj_edit_page.php?project_id=", "")
                 description = element.find_element_by_css_selector("td:nth-child(5)").text
                 self.project_cache.append(Project(name=name, description=description, id=id))
 
